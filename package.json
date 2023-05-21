@@ -1,16 +1,18 @@
 {
-  "name": "@jscriptlogger/client",
-  "version": "0.0.8",
+  "name": "@jscriptlab/client",
+  "version": "0.0.22",
   "description": "",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "files": [
-    "*.{js,d.ts}",
+    "{src,auth-manager-browser}/**/*.{js,d.ts}",
     "es/**/*.{js,d.ts}"
   ],
   "scripts": {
-    "build:es": "npx tsc --module ESNext --outDir es",
-    "set-es-paths": "npx package-utilities --set-es-paths --include \"./*.js\" --es-folder es",
-    "prepublishOnly": "npx tsc && yarn run build:es && yarn run set-es-paths"
+    "build:es": "npx tsc --project $TS_CONFIG_PATH --module ESNext --outDir es",
+    "build": "npx tsc -b auth-manager-browser src && yarn run build:es:all",
+    "build:es:all": "TS_CONFIG_PATH=src/tsconfig.json yarn run build:es && TS_CONFIG_PATH=auth-manager-browser/tsconfig.json yarn run build:es",
+    "set-es-paths": "npx package-utilities --set-es-paths --include \"./{auth-manager-browser,src}/**/*.js\" --es-folder es",
+    "prepublishOnly": "yarn run build && yarn run set-es-paths"
   },
   "author": "",
   "license": "ISC",
@@ -21,16 +23,17 @@
     "typescript": "5.x"
   },
   "dependencies": {
+    "@jscriptlab/schema": "0.x",
     "@jscriptlogger/lib": "0.x",
-    "@jscriptlogger/schema": "0.x",
     "autobind-decorator": "^2.4.0",
     "jsbuffer": "0.x",
     "luxon": "3.x",
     "package-utilities": "^0.0.6"
   },
   "browser": {
-    "./index.js": "./es/index.js",
-    "./LoggerNetwork.js": "./es/LoggerNetwork.js",
-    "./Client.js": "./es/Client.js"
+    "./auth-manager-browser/index.js": "./es/auth-manager-browser/index.js",
+    "./src/index.js": "./es/src/index.js",
+    "./src/Exception.js": "./es/src/Exception.js",
+    "./src/Client.js": "./es/src/Client.js"
   }
 }
