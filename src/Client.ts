@@ -104,6 +104,7 @@ export interface IAuthManager {
 
 export interface IClientEventMap {
   update: Update;
+  newSessionCreated: Client;
 }
 
 export default class Client extends EventEmitter<IClientEventMap> {
@@ -397,6 +398,9 @@ export default class Client extends EventEmitter<IClientEventMap> {
             break;
           case "protocol.index.messageResultError":
             pending.resolve(result.error);
+            break;
+          default:
+            this.#logger.error("unhandled message result: %o", result);
         }
         break;
       }
@@ -404,6 +408,9 @@ export default class Client extends EventEmitter<IClientEventMap> {
         for (const u of result.updates) {
           this.emit("update", u);
         }
+        break;
+      case "protocol.index.newSessionCreated":
+        this.emit("newSessionCreated", this);
         break;
       default:
         this.#logger.error("failed to process message: %o", result);
