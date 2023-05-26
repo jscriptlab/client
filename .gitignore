@@ -2,4 +2,6 @@
 *.js
 *.d.ts
 *.map
+/*.tgz
 tsconfig.tsbuildinfo
+/yarn-error.log

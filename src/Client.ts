@@ -1,17 +1,23 @@
 import { boundMethod } from "autobind-decorator";
 import Long from "long";
+import { EventEmitter } from "eventual-js";
 import { ILogger } from "@jscriptlogger/lib";
 import { Codec } from "jsbuffer/codec";
 import {
   decodeServerMessageTrait,
   encodeClientMessageTrait,
   messageRequest,
-} from "@jscriptlogger/schema/src/protocol";
-import { RequestResult } from "@jscriptlogger/schema/src/__types__";
-import { Request } from "@jscriptlogger/schema/src/protocol/Request";
-import { Result } from "@jscriptlogger/schema/src/protocol/Result";
-import { Error } from "@jscriptlogger/schema/src/protocol/Error";
+} from "@jscriptlab/schema/src/protocol";
+import { RequestResult } from "@jscriptlab/schema/src/__types__";
+import { Request } from "@jscriptlab/schema/src/protocol/Request";
+import { Result } from "@jscriptlab/schema/src/protocol/Result";
+import { Error } from "@jscriptlab/schema/src/protocol/Error";
 import { DateTime } from "luxon";
+import { authorization } from "@jscriptlab/schema/src/auth";
+import { messageAuthenticated } from "@jscriptlab/schema/src/index";
+import { objectId } from "@jscriptlab/schema/src/objectId";
+import Exception from "./Exception";
+import { Update } from "@jscriptlab/schema/src/update";
 
 export interface IWebSocketEventMap {
   close: ICloseEvent;
@@ -66,6 +72,7 @@ interface IPending {
   maxRetryCount: number;
   retries: IPendingSentInformation[];
   sent: IPendingSentInformation | null;
+  pendingSent: Promise<void>;
   resolve(resolve: Result | Error): void;
 }
 
@@ -84,9 +91,22 @@ export interface IClientOptions {
   getRandomValues(value: Uint8Array): Uint8Array;
   textDecoder: ITextDecoder;
   textEncoder: ITextEncoder;
+  authManager: IAuthManager;
 }
 
-export default class Client {
+export interface IAuthManager {
+  id(): Readonly<objectId> | null;
+  hasKey(): Promise<boolean>;
+  setAuthorization(auth: authorization): void;
+  encrypt(value: Uint8Array, iv: Uint8Array): Promise<ArrayBuffer>;
+  decrypt(value: Uint8Array, iv: Uint8Array): Promise<ArrayBuffer>;
+}
+
+export interface IClientEventMap {
+  update: Update;
+}
+
+export default class Client extends EventEmitter<IClientEventMap> {
   readonly #WebSocket;
   readonly #url;
   readonly #textDecoder;
@@ -95,6 +115,7 @@ export default class Client {
   readonly #pending = new Map<string, IPending>();
   readonly #getRandomValues;
   readonly #codec;
+  readonly #authManager;
   #session: {
     id: Long;
   } | null;
@@ -106,7 +127,9 @@ export default class Client {
     getRandomValues,
     textDecoder,
     textEncoder,
+    authManager,
   }: IClientOptions) {
+    super();
     this.#session = null;
     this.#connection = null;
     this.#url = url;
@@ -114,6 +137,7 @@ export default class Client {
     this.#getRandomValues = getRandomValues;
     this.#WebSocket = WebSocket;
     this.#textDecoder = textDecoder;
+    this.#authManager = authManager;
     this.#textEncoder = textEncoder;
     this.#codec = new Codec({
       textDecoder: this.#textDecoder,
@@ -132,6 +156,7 @@ export default class Client {
       const requestId = this.#randomLong();
       const pending: IPending = {
         requestId,
+        pendingSent: Promise.resolve(),
         request,
         maxRetryCount,
         retries: [],
@@ -170,18 +195,25 @@ export default class Client {
       };
     }
     /**
+     * this means session that was created here will be used inside after
+     * promise is resolved
+     */
+    const session = this.#session;
+    /**
      * whether initial sent of the request was expired or not
      */
     const isExpired =
       pending.sent !== null &&
       DateTime.now().toMillis() >= pending.sent.expiresAt.toMillis();
-    const encoded = this.#codec.encode(
-      encodeClientMessageTrait,
-      messageRequest({
-        requestId: pending.requestId.toString(),
-        request: pending.request,
-        sessionId: this.#session.id.toString(),
-      })
+    const encoded = this.#cloneUint8Array(
+      this.#codec.encode(
+        encodeClientMessageTrait,
+        messageRequest({
+          requestId: pending.requestId.toString(),
+          request: pending.request,
+          sessionId: this.#session.id.toString(),
+        })
+      )
     );
     const expirationDifference = {
       seconds: 10,
@@ -208,14 +240,47 @@ export default class Client {
     if (pending.sent !== null) {
       return;
     }
-    const isSent = this.#send(encoded);
-    if (isSent) {
-      const sentAt = DateTime.now();
-      pending.sent = {
-        date: sentAt,
-        expiresAt: sentAt.plus(expirationDifference),
-      };
-    }
+    pending.pendingSent = pending.pendingSent.then(async () => {
+      let isSent: boolean;
+      const authId = this.#authManager.id();
+      if ((await this.#authManager.hasKey()) && authId !== null) {
+        const iv = this.#getRandomValues(new Uint8Array(8));
+        try {
+          const encrypted = new Uint8Array(
+            await this.#authManager.encrypt(encoded, iv)
+          );
+          isSent = this.#send(
+            this.#codec.encode(
+              encodeClientMessageTrait,
+              messageAuthenticated({
+                authId,
+                iv,
+                sessionId: session.id.toString(),
+                message: encrypted,
+              })
+            )
+          );
+        } catch (reason) {
+          this.#logger.error("failed to encrypt encoded data: %o", reason);
+          isSent = false;
+        }
+      } else {
+        isSent = this.#send(encoded);
+      }
+      if (isSent) {
+        const sentAt = DateTime.now();
+        pending.sent = {
+          date: sentAt,
+          expiresAt: sentAt.plus(expirationDifference),
+        };
+      }
+    });
+  }
+
+  #cloneUint8Array(val: Uint8Array) {
+    const copy = new Uint8Array(val.byteLength);
+    copy.set(val);
+    return copy;
   }
   #send(value: Uint8Array) {
     if (
@@ -253,6 +318,14 @@ export default class Client {
     if (!(data instanceof ArrayBuffer)) {
       return;
     }
+    this.#onReceiveArrayBuffer(data).catch((reason) => {
+      this.#logger.error(
+        "failed processing encoded message with error: %o",
+        reason
+      );
+    });
+  }
+  async #onReceiveArrayBuffer(data: ArrayBuffer) {
     const result = this.#codec.decode(
       decodeServerMessageTrait,
       new Uint8Array(data)
@@ -265,6 +338,26 @@ export default class Client {
      * process result
      */
     switch (result._name) {
+      case "index.messageAuthenticated": {
+        let arrayBuffer: ArrayBuffer;
+        try {
+          arrayBuffer = await this.#authManager.decrypt(
+            result.message,
+            result.iv
+          );
+        } catch (reason) {
+          this.#logger.error("failed to decrypt authenticated message: %o", {
+            reason,
+            result,
+          });
+          throw new Exception("Failed to decrypt authenticated message");
+        }
+        /**
+         * process decrypted array buffer
+         */
+        await this.#onReceiveArrayBuffer(arrayBuffer);
+        break;
+      }
       case "protocol.index.acknowledgeMessage": {
         const pending = this.#pending.get(result.messageId);
         if (!pending) {
@@ -307,6 +400,11 @@ export default class Client {
         }
         break;
       }
+      case "update.Updates":
+        for (const u of result.updates) {
+          this.emit("update", u);
+        }
+        break;
       default:
         this.#logger.error("failed to process message: %o", result);
     }
