@@ -66,16 +66,16 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@jscriptlab/schema@0.x":
-  version "0.0.22"
-  resolved "https://npm.jscriptlab.online/@jscriptlab/schema/-/schema-0.0.22.tgz#606706715339ae3f2d2b6f0574289e2fe7b89a60"
-  integrity sha512-iiT/7yw/j+g4mRmcniLxbTR+4a463jbvc8eoQNb0+yNsz0flkAJ4MPNNjgWZRgsLz3LaYXXytSSS3BIRbKoaQw==
+  version "0.0.30"
+  resolved "https://npm.jscriptlab.online/@jscriptlab/schema/-/schema-0.0.30.tgz#90d7c8274471b99ccaf74516e08196316179ebed"
+  integrity sha512-txb2ncXrh0OLzZzbELXiVrnHJ4enXOazM3rtcCbuFlVrIQM8A34HXhFnYnYrhvH7mRzi5qPpd6K9J6gLcFUPOw==
   dependencies:
     jsbuffer "0.x"
 
 "@jscriptlogger/lib@0.x":
-  version "0.0.15"
-  resolved "https://npm.jscriptlab.online/@jscriptlogger/lib/-/lib-0.0.15.tgz#a4ad43a35cca73e5bd1e7abbaedbd7ff7b728355"
-  integrity sha512-d+Cj9qLxlt8zTJ+k5H+vgWKmRm7LYGBqnWILYlzyvqjIFC5OqA9Ou/RWtQIWi6g+0Nq/Sjy/iaveeOiz3kAIMQ==
+  version "0.0.16"
+  resolved "https://npm.jscriptlab.online/@jscriptlogger/lib/-/lib-0.0.16.tgz#ecb521701c142b90f3293de35331ca7e3d23b8c9"
+  integrity sha512-MQpEctYEo1FViirSzxz70onF/6dbYVXhCrGWk7Lv+L5BPrycoROxG6uITuoT/khRnYKpP/tEd/uxP3rTVUa8yg==
   dependencies:
     autobind-decorator "^2.4.0"
     jsbuffer "0.x"
@@ -441,13 +441,13 @@ glob-parent@^6.0.2:
     is-glob "^4.0.3"
 
 glob@10.x:
-  version "10.2.5"
-  resolved "https://npm.jscriptlab.online/glob/-/glob-10.2.5.tgz#73c1850ac8f077810d8370ba414b382ad1a86083"
-  integrity sha512-Gj+dFYPZ5hc5dazjXzB0iHg2jKWJZYMjITXYPBRQ/xc2Buw7H0BINknRTwURJ6IC6MEFpYbLvtgVb3qD+DwyuA==
+  version "10.2.6"
+  resolved "https://npm.jscriptlab.online/glob/-/glob-10.2.6.tgz#1e27edbb3bbac055cb97113e27a066c100a4e5e1"
+  integrity sha512-U/rnDpXJGF414QQQZv5uVsabTVxMSwzS5CH0p3DRCIV6ownl4f7PzGnkGmvlum2wB+9RlJWJZ6ACU1INnBqiPA==
   dependencies:
     foreground-child "^3.1.0"
     jackspeak "^2.0.3"
-    minimatch "^9.0.0"
+    minimatch "^9.0.1"
     minipass "^5.0.0 || ^6.0.2"
     path-scurry "^1.7.0"
 
@@ -539,9 +539,9 @@ isexe@^2.0.0:
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
 
 jackspeak@^2.0.3:
-  version "2.2.0"
-  resolved "https://npm.jscriptlab.online/jackspeak/-/jackspeak-2.2.0.tgz#497cbaedc902ec3f31d5d61be804d2364ff9ddad"
-  integrity sha512-r5XBrqIJfwRIjRt/Xr5fv9Wh09qyhHfKnYddDlpM+ibRR20qrYActpCAgU6U+d53EOEjzkvxPMVHSlgR7leXrQ==
+  version "2.2.1"
+  resolved "https://npm.jscriptlab.online/jackspeak/-/jackspeak-2.2.1.tgz#655e8cf025d872c9c03d3eb63e8f0c024fef16a6"
+  integrity sha512-MXbxovZ/Pm42f6cDIDkl3xpwv1AGwObKwfmjs2nQePiy85tP3fatofl3FC1aBsOtP/6fq5SbtgHwWcMsLP+bDw==
   dependencies:
     "@isaacs/cliui" "^8.0.2"
   optionalDependencies:
@@ -560,9 +560,9 @@ jsbi@4.x:
   integrity sha512-SnZNcinB4RIcnEyZqFPdGPVgrg2AcnykiBy0sHVJQKHYeaLUvi3Exj+iaPpLnFVkDPZIV4U0yvgC9/R4uEAZ9g==
 
 jsbuffer@0.x:
-  version "0.0.51"
-  resolved "https://npm.jscriptlab.online/jsbuffer/-/jsbuffer-0.0.51.tgz#c02b47bddf40eed3139abad55438cf25b6316259"
-  integrity sha512-yVxHMWHQfd9lfpPyD+nUiY3BuJ3AIFSgHXcNY0Ko1/iwjryISWZZZFAgx+bBfzeTErG7YlJdgcsgnGG75Jjq3w==
+  version "0.0.53"
+  resolved "https://npm.jscriptlab.online/jsbuffer/-/jsbuffer-0.0.53.tgz#f25555766fb1df7c873ef054a681a5189605fbef"
+  integrity sha512-gFbyV/4yEl/kQWPETT3EoweOebGGz6ymsioX0u8CqS4KyasSN5ormTBe86fnoH/Hr7zWmCrN8/cDBgh9XkDYhg==
   dependencies:
     cli-argument-helper "0.x"
     crc "4.x"
@@ -622,10 +622,10 @@ minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^9.0.0:
-  version "9.0.0"
-  resolved "https://npm.jscriptlab.online/minimatch/-/minimatch-9.0.0.tgz#bfc8e88a1c40ffd40c172ddac3decb8451503b56"
-  integrity sha512-0jJj8AvgKqWN05mrwuqi8QYKx1WmYSUoKSxu5Qhs9prezTz10sxAHGNZe9J9cqIJzta8DWsleh2KaVaLl6Ru2w==
+minimatch@^9.0.1:
+  version "9.0.1"
+  resolved "https://npm.jscriptlab.online/minimatch/-/minimatch-9.0.1.tgz#8a555f541cf976c622daf078bb28f29fb927c253"
+  integrity sha512-0jWhJpD/MdhPXwPuiRkCbfYfSKp2qnn2eOc279qI7f+osl/l+prKSrvhg157zSYvx/1nmgn2NqdT6k2Z7zSH9w==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -776,7 +776,6 @@ signal-exit@^4.0.1:
   integrity sha512-MY2/qGx4enyjprQnFaZsHib3Yadh3IXyV2C321GY0pjGfVBu4un0uDJkwgdxqO+Rdx8JMT8IfJIRwbYVz3Ob3Q==
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
-  name string-width-cjs
   version "4.2.3"
   resolved "https://npm.jscriptlab.online/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -795,7 +794,6 @@ string-width@^5.0.1, string-width@^5.1.2:
     strip-ansi "^7.0.1"
 
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
-  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://npm.jscriptlab.online/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
